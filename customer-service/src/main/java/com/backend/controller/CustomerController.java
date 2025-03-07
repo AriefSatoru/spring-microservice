@@ -1,6 +1,8 @@
 package com.backend.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,12 +15,21 @@ import com.backend.dto.SearchEmailRequest;
 import com.backend.entity.Customer;
 import com.backend.service.CustomerService;
 
+@RefreshScope
 @RestController
 @RequestMapping("/api/customers")
 public class CustomerController {
     
     @Autowired
     private CustomerService customerService;
+
+    @Value("${spring.application.version}")
+    private String versionString;
+
+    @GetMapping("/version")
+    public String getVersion() {
+        return versionString;
+    }
 
     @PostMapping
     public Customer save(@RequestBody Customer customer) {
