@@ -1,6 +1,11 @@
 package com.backend.service;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -8,7 +13,7 @@ import com.backend.entity.UserInfo;
 import com.backend.repository.UserInfoRepo;
 
 @Service
-public class UserInfoService {
+public class UserInfoService implements UserDetailsService {
     
     @Autowired
     private UserInfoRepo userInfoRepo;
@@ -20,5 +25,11 @@ public class UserInfoService {
         userInfo.setPassword(passwordEncoder.encode(userInfo.getPassword()));
         userInfoRepo.save(userInfo);
         return "User added successfully";
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Optional<UserInfo> userInfo = userInfoRepo.findByName(username);
+        return userInfo.map(UserInfoDetails::new).orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 }
